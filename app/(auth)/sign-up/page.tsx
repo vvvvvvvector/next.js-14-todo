@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 export default function SignUpPage() {
   return (
     <div className='grid h-screen place-items-center'>
-      <div className='flex w-full max-w-[380px] flex-col gap-12'>
+      <div className='flex w-full max-w-[400px] flex-col gap-12 px-4 sm:px-0'>
         <h1 className='text-center text-2xl font-semibold tracking-wider'>
           Create new account 🙌
         </h1>
         <SignUpForm />
-        <div className='flex justify-center gap-3 px-5 text-sm'>
+        <div className='flex justify-center gap-3 text-sm'>
           <span>Already have an account?</span>
           <Link href={PAGES.SIGN_IN} className='text-neutral-500 underline'>
             Sign in

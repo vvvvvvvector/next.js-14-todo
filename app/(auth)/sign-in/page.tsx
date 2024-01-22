@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function SignInPage() {
   return (
     <div className='grid h-screen place-items-center'>
-      <div className='flex w-full max-w-[380px] flex-col gap-12'>
+      <div className='flex w-full max-w-[400px] flex-col gap-12 px-4 sm:px-0'>
         <div className='space-y-3 text-center'>
           <h1 className='text-2xl font-semibold tracking-wider'>
             Welcome back 👋
@@ -23,7 +23,7 @@ export default function SignInPage() {
           </p>
         </div>
         <SignInForm />
-        <div className='flex justify-center gap-3 px-5 text-sm'>
+        <div className='flex justify-center gap-3 text-sm'>
           <span>Don&apos;t have an account?</span>
           <Link href={PAGES.SIGN_UP} className='text-neutral-500 underline'>
             Sign up

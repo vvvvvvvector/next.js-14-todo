@@ -1,3 +1,9 @@
+import { Button } from '~/components/ui/button';
+
 export default function Home() {
-  return <main className='bg-black text-white'>Hello World!</main>;
+  return (
+    <main>
+      <Button>Click!</Button>
+    </main>
+  );
 }

@@ -24,7 +24,7 @@ export default withAuth(
       //   return NextResponse.redirect(new URL(`/error`, req.url));
       // }
 
-      return null; // '/', '/sign-in', '/sign-up' pages are allowed for visiting
+      return null; // just does nothing -> interrupting middleware further exec. 🤷‍♂️
     }
 
     if (!isAuthPage) {
@@ -34,12 +34,13 @@ export default withAuth(
   {
     callbacks: {
       async authorized() {
-        return true; // is always called, without it above code doesn't work
+        return true; // without it the code above doesn't work
       }
     }
   }
 );
 
+// It seems not to be working tbh if I have middleware above like above 🧐
 // export const config = {
-//   matcher: ['/apple']
+//   matcher: ['/:username*']
 // };

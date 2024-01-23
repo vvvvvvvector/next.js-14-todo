@@ -48,7 +48,7 @@ export function SignInForm() {
         success: () => {
           setLoading(false);
 
-          router.push('/');
+          router.push(`/${data.username}`);
 
           return 'Successfully signed in';
         },

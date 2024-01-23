@@ -45,10 +45,22 @@ export function SignUpForm() {
     resolver: zodResolver(signUpSchema)
   });
 
-  console.log(errors);
-
   async function onSubmit(data: FormData) {
     console.log(data);
+
+    const res = await fetch('/api/auth/sign-up', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: data.username,
+        password: data.password
+      })
+    });
+
+    // then if everything is fine signIn()....
+
+    const message = await res.json();
+
+    console.log(message);
   }
 
   return (

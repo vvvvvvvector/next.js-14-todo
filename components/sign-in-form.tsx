@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signIn } from 'next-auth/react';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -30,7 +31,11 @@ export function SignInForm() {
   });
 
   async function onSubmit(data: FormData) {
-    console.log(data);
+    const response = await signIn('credentials', {
+      username: data.username,
+      password: data.password,
+      redirect: false
+    });
   }
 
   return (

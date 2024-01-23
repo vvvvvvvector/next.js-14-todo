@@ -1,6 +1,8 @@
 import { type NextAuthOptions } from 'next-auth';
-
 import Credentials from 'next-auth/providers/credentials';
+import * as bcrypt from 'bcrypt';
+
+import { db } from '~/lib/db';
 
 import { PAGES } from '~/lib/constants';
 
@@ -23,15 +25,24 @@ export const authOptions = {
       async authorize(credentials, req) {
         if (!credentials) return null;
 
-        if (
-          credentials.username === 'admin' &&
-          credentials.password === 'admin'
-        ) {
-          // this will be passed to the jwt callback
-          return {
-            id: 1,
-            username: 'vvvvvectoer'
-          };
+        const user = await db.user.findUnique({
+          where: {
+            username: credentials.username
+          }
+        });
+
+        if (user) {
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (isPasswordValid) {
+            return {
+              id: user.id,
+              username: user.username
+            };
+          }
         }
 
         return null;

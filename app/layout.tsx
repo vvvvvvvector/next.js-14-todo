@@ -1,5 +1,6 @@
 import { type Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from '~/components/ui/sonner';
 
 import { cn } from '~/lib/utils';
 
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body className={cn('min-h-screen', `${inter.className}`)}>
         {children}
+        <Toaster richColors closeButton />
       </body>
     </html>
   );

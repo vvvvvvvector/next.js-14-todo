@@ -1,0 +1,21 @@
+datasource db {
+    provider = "mysql"
+    url      = "" // temporary removed I will config eng vars later
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id       Int    @id @default(autoincrement())
+    username String @unique
+    password String
+}
+
+model Task {
+    id          Int     @id
+    done        Boolean
+    name        String
+    description String
+}

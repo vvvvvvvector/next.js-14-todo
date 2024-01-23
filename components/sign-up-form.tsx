@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signIn } from 'next-auth/react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
@@ -37,6 +40,8 @@ type FormData = z.infer<typeof signUpSchema>;
 export function SignUpForm() {
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -46,9 +51,9 @@ export function SignUpForm() {
   });
 
   async function onSubmit(data: FormData) {
-    console.log(data);
+    setLoading(true);
 
-    const res = await fetch('/api/auth/sign-up', {
+    const signUpResponse = await fetch('/api/auth/sign-up', {
       method: 'POST',
       body: JSON.stringify({
         username: data.username,
@@ -56,11 +61,36 @@ export function SignUpForm() {
       })
     });
 
-    // then if everything is fine signIn()....
+    const json = await signUpResponse.json(); // probably I can type it using zod
 
-    const message = await res.json();
+    if (!json.success) {
+      setLoading(false);
 
-    console.log(message);
+      toast.error(json.message);
+    } else {
+      toast.promise(
+        signIn('credentials', {
+          username: data.username,
+          password: data.password,
+          redirect: false
+        }),
+        {
+          loading: 'Loading...',
+          success: () => {
+            setLoading(false);
+
+            router.push('/');
+
+            return 'Successfully signed up';
+          },
+          error: () => {
+            setLoading(false);
+
+            return 'Error occured while signin in to your account';
+          }
+        }
+      );
+    }
   }
 
   return (

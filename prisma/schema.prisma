@@ -1,6 +1,7 @@
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
 generator client {
@@ -8,14 +9,25 @@ generator client {
 }
 
 model User {
-    id       Int    @id @default(autoincrement())
+    id       String @id @default(cuid())
     username String @unique
     password String
+
+    tasks Task[]
+
+    @@map("users")
 }
 
 model Task {
-    id          String  @id @default(uuid())
-    done        Boolean @default(false)
+    id          String    @id @default(cuid())
+    done        Boolean   @default(false)
     name        String
     description String
+    due         DateTime?
+    authorId    String
+
+    author User @relation(fields: [authorId], references: [id])
+
+    @@index([authorId])
+    @@map("tasks")
 }

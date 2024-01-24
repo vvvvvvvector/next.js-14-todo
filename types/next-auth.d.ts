@@ -4,13 +4,13 @@ declare module 'next-auth' {
   // todo: broaden type, not replace with the new
   interface Session {
     user: {
-      id: number;
+      id: string;
       username: string;
     };
   }
 
   interface User {
-    id: number;
+    id: string;
     username: string;
   }
 }

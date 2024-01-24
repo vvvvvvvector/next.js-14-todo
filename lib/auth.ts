@@ -52,7 +52,7 @@ export const authOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
-        session.user.id = token.id as number;
+        session.user.id = token.id as string;
         session.user.username = token.username as string;
       }
 

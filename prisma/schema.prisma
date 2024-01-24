@@ -21,7 +21,7 @@ model User {
 model Task {
     id          String    @id @default(cuid())
     done        Boolean   @default(false)
-    name        String
+    title       String
     description String?
     due         DateTime?
     authorId    String

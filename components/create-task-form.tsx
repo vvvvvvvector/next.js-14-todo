@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -14,13 +16,23 @@ import {
   PopoverTrigger
 } from '~/components/ui/popover';
 import { Calendar } from '~/components/ui/calendar';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '~/components/ui/dialog';
 
 import { Icons } from '~/components/icons';
 
 import { formatDate } from '~/lib/utils';
 
 const createTaskSchema = z.object({
-  title: z.string().min(1, { message: 'Title is required' }),
+  title: z
+    .string()
+    .min(1, { message: 'Title is required' })
+    .max(30, { message: 'The title is too long (max: 30 symbols)' }),
   description: z.string().optional(),
   due: z.date().optional()
 });
@@ -28,65 +40,98 @@ const createTaskSchema = z.object({
 type FormData = z.infer<typeof createTaskSchema>;
 
 export function CreateTaskForm() {
+  const [open, setOpen] = useState(false);
+
   const {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormData>({
     resolver: zodResolver(createTaskSchema)
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const onSubmit = async (data: FormData) => {
+    const res = await fetch('/api/tasks', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: data.title.trim(),
+        description: data.description,
+        due: data.due
+      })
+    });
+
+    const newPostId = await res.json();
+    console.log(newPostId);
+
+    toast.success('A new task was successfully created!');
+
+    reset();
+
+    setOpen(false);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className='grid gap-5'>
-        <div className='grid gap-2'>
-          <Label htmlFor='title'>Title</Label>
-          <Input id='title' {...register('title')} />
-          {errors?.title && (
-            <p className='px-1 text-xs text-red-600'>{errors.title.message}</p>
-          )}
-        </div>
-        <div className='grid gap-2'>
-          <Label htmlFor='description'>Description</Label>
-          <Textarea id='description' {...register('description')} />
-        </div>
-        <div className='grid gap-2'>
-          <Label htmlFor='due'>Due</Label>
-          <Controller
-            control={control}
-            name='due'
-            render={({ field: { value, onChange } }) => (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id='due'
-                    variant='outline'
-                    className='flex justify-between'
-                  >
-                    <span>
-                      {value ? formatDate(value.toString()) : 'Pick a date'}
-                    </span>
-                    <Icons.calender className='size-4' />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='center'>
-                  <Calendar
-                    mode='single'
-                    selected={value}
-                    onSelect={onChange}
-                  />
-                </PopoverContent>
-              </Popover>
-            )}
-          />
-        </div>
-        <Button type='submit'>Create 🎉</Button>
-      </div>
-    </form>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant='outline' size='icon'>
+          <Icons.plus className='size-4' />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create a new task</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className='grid gap-5'>
+            <div className='grid gap-2'>
+              <Label htmlFor='title'>Title</Label>
+              <Input id='title' {...register('title')} />
+              {errors?.title && (
+                <p className='px-1 text-xs text-red-600'>
+                  {errors.title.message}
+                </p>
+              )}
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor='description'>Description</Label>
+              <Textarea id='description' {...register('description')} />
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor='due'>Due</Label>
+              <Controller
+                control={control}
+                name='due'
+                render={({ field: { value, onChange } }) => (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id='due'
+                        variant='outline'
+                        className='flex justify-between'
+                      >
+                        <span>
+                          {value ? formatDate(value.toString()) : 'Pick a date'}
+                        </span>
+                        <Icons.calendar className='size-4' />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='center'>
+                      <Calendar
+                        mode='single'
+                        selected={value}
+                        onSelect={onChange}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+            </div>
+            <Button type='submit'>Create 🎉</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

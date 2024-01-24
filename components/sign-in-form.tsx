@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signIn } from 'next-auth/react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -21,6 +24,8 @@ type FormData = z.infer<typeof signInSchema>;
 export function SignInForm() {
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -30,7 +35,30 @@ export function SignInForm() {
   });
 
   async function onSubmit(data: FormData) {
-    console.log(data);
+    setLoading(true);
+
+    toast.promise(
+      signIn('credentials', {
+        username: data.username,
+        password: data.password,
+        redirect: false
+      }),
+      {
+        loading: 'Loading...',
+        success: () => {
+          setLoading(false);
+
+          router.push(`/${data.username}`);
+
+          return 'Successfully signed in';
+        },
+        error: () => {
+          setLoading(false);
+
+          return 'Wrong username or password!';
+        }
+      }
+    );
   }
 
   return (
@@ -56,7 +84,7 @@ export function SignInForm() {
           <Label htmlFor='password'>Password</Label>
           <Input
             id='password'
-            placeholder='strong password'
+            placeholder='pAssw0rd'
             type='password'
             autoCapitalize='none'
             autoCorrect='off'

@@ -22,7 +22,7 @@ model Task {
     id          String    @id @default(cuid())
     done        Boolean   @default(false)
     name        String
-    description String
+    description String?
     due         DateTime?
     authorId    String
 

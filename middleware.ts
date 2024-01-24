@@ -1,6 +1,5 @@
 import { withAuth } from 'next-auth/middleware';
 import { getToken } from 'next-auth/jwt';
-import { NextResponse } from 'next/server';
 
 import { PAGES } from '~/lib/constants';
 
@@ -17,18 +16,18 @@ export default withAuth(
 
     if (isAuth) {
       if (isAuthPage) {
-        return NextResponse.redirect(new URL(`/${token.username}`, req.url));
+        return Response.redirect(new URL(`/${token.username}`, req.url));
       }
 
       // if (token.username !== req.nextUrl.pathname.slice(1)) {
-      //   return NextResponse.redirect(new URL(`/error`, req.url));
+      //   return Response.redirect(new URL(`/error`, req.url));
       // }
 
       return null; // just does nothing -> interrupting middleware further exec. 🤷‍♂️
     }
 
     if (!isAuthPage) {
-      return NextResponse.redirect(new URL(`${PAGES.SIGN_IN}`, req.url));
+      return Response.redirect(new URL(`${PAGES.SIGN_IN}`, req.url));
     }
   },
   {

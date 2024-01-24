@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 import * as bcrypt from 'bcrypt';
 
 import { db } from '~/lib/db';
@@ -14,7 +12,7 @@ export async function POST(request: Request) {
   });
 
   if (user) {
-    return NextResponse.json({
+    return Response.json({
       success: false,
       message: 'User already exists.'
     });
@@ -30,7 +28,7 @@ export async function POST(request: Request) {
     }
   });
 
-  return NextResponse.json({
+  return Response.json({
     success: true,
     message: 'User was successfully created.'
   });

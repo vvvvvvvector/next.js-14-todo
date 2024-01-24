@@ -9,9 +9,9 @@ export default async function HomePage() {
 
   return (
     <div className='grid h-screen place-items-center'>
-      Home page 🏡
       {session && (
         <div className='flex flex-col gap-5'>
+          Home page 🏡
           <span>{`user id: ${session.user.id}`}</span>
           <span>{`user username: ${session.user.username}`}</span>
           <SignOutButton />

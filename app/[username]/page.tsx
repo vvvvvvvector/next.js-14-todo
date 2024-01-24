@@ -1,6 +1,5 @@
 import { type Metadata } from 'next';
-
-import { CreateTaskForm } from '~/components/create-task-form';
+import { getServerSession } from 'next-auth';
 
 import {
   DropdownMenu,
@@ -13,13 +12,31 @@ import { Separator } from '~/components/ui/separator';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Button } from '~/components/ui/button';
 
-import { getMyTasks } from '~/app/actions';
-import { formatDate } from '~/lib/utils';
+import { CreateTaskForm } from '~/components/create-task-form';
 import { Icons } from '~/components/icons';
+
+import { db } from '~/lib/db';
+import { formatDate } from '~/lib/utils';
+import { authOptions } from '~/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
 };
+
+export async function getMyTasks() {
+  const session = await getServerSession(authOptions);
+
+  const tasks = await db.task.findMany({
+    where: {
+      authorId: session?.user.id
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  return tasks;
+}
 
 export default async function HomePage() {
   const tasks = await getMyTasks();

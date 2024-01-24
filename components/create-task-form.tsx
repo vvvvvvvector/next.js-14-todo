@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -41,6 +42,9 @@ type FormData = z.infer<typeof createTaskSchema>;
 
 export function CreateTaskForm() {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const {
     control,
@@ -53,7 +57,9 @@ export function CreateTaskForm() {
   });
 
   const onSubmit = async (data: FormData) => {
-    const res = await fetch('/api/tasks', {
+    setLoading(true);
+
+    const response = await fetch('/api/tasks', {
       method: 'POST',
       body: JSON.stringify({
         title: data.title.trim(),
@@ -62,14 +68,15 @@ export function CreateTaskForm() {
       })
     });
 
-    const newPostId = await res.json();
-    console.log(newPostId);
+    setLoading(false);
+
+    setOpen(false);
+
+    router.refresh();
 
     toast.success('A new task was successfully created!');
 
     reset();
-
-    setOpen(false);
   };
 
   return (
@@ -122,13 +129,31 @@ export function CreateTaskForm() {
                         mode='single'
                         selected={value}
                         onSelect={onChange}
+                        disabled={(date) => {
+                          const yesterday = (date = new Date()) => {
+                            date.setDate(date.getDate() - 1);
+
+                            return date;
+                          };
+
+                          return date < yesterday();
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
                 )}
               />
             </div>
-            <Button type='submit'>Create 🎉</Button>
+            <Button disabled={loading} type='submit'>
+              {loading ? (
+                <div className='flex items-center gap-2'>
+                  <Icons.spinner className='size-4 animate-spin' />
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                'Create 🎉'
+              )}
+            </Button>
           </div>
         </form>
       </DialogContent>

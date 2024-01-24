@@ -24,6 +24,7 @@ model Task {
     title       String
     description String?
     due         DateTime?
+    createdAt   DateTime  @default(now())
     authorId    String
 
     author User @relation(fields: [authorId], references: [id])

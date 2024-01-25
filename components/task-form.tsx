@@ -68,7 +68,11 @@ function Form({
         </div>
         <div className='grid gap-2'>
           <Label htmlFor='description'>Description</Label>
-          <Textarea id='description' {...register('description')} />
+          <Textarea
+            className='max-h-80'
+            id='description'
+            {...register('description')}
+          />
         </div>
         <div className='grid gap-2'>
           <Label htmlFor='due'>Due</Label>

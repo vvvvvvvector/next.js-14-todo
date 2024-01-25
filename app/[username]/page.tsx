@@ -1,6 +1,5 @@
 import { type Metadata } from 'next';
 import { getServerSession } from 'next-auth';
-import { revalidatePath } from 'next/cache';
 
 import { Separator } from '~/components/ui/separator';
 import { Checkbox } from '~/components/ui/checkbox';
@@ -12,13 +11,16 @@ import {
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu';
 import { Button } from '~/components/ui/button';
+import { Dialog, DialogTrigger } from '~/components/ui/dialog';
 
-import { CreateTaskForm } from '~/components/create-task-form';
 import { Icons } from '~/components/icons';
+import { EditTaskForm, CreateTaskForm } from '~/components/task-form';
 
 import { db } from '~/lib/db';
 import { formatDate } from '~/lib/utils';
 import { authOptions } from '~/lib/auth';
+
+import { deleteTaskById, toogleDoneState } from '~/app/actions';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
@@ -60,20 +62,11 @@ export default async function HomePage() {
             >
               <Checkbox
                 checked={task.done}
-                onCheckedChange={async (state) => {
-                  'use server';
-
-                  await db.task.update({
-                    where: {
-                      id: task.id
-                    },
-                    data: {
-                      done: state === true ? true : false
-                    }
-                  });
-
-                  revalidatePath('/[username]', 'page');
-                }}
+                onCheckedChange={toogleDoneState.bind(
+                  null,
+                  task.id,
+                  !task.done
+                )}
               />
               <div className='flex flex-1 flex-col gap-2 overflow-hidden'>
                 <h4 className='font-semibold'>{task.title}</h4>
@@ -90,44 +83,42 @@ export default async function HomePage() {
                   <span>no due date</span>
                 )}
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant='ghost' size='icon'>
-                    <Icons.more className='size-4' />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>
-                    <Icons.edit className='mr-2 size-4' />
-                    <span>Edit</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Icons.share className='mr-2 size-4' />
-                    <span>Share link</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <form
-                    action={async () => {
-                      'use server';
-
-                      await db.task.delete({
-                        where: {
-                          id: task.id
-                        }
-                      });
-
-                      revalidatePath('/[username]', 'page');
-                    }}
-                  >
-                    <button className='w-full' type='submit'>
+              <Dialog>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant='ghost' size='icon'>
+                      <Icons.more className='size-4' />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DialogTrigger asChild>
                       <DropdownMenuItem>
-                        <Icons.delete className='mr-2 size-4 text-red-500' />
-                        <span className='text-red-500'>Delete</span>
+                        <Icons.edit className='mr-2 size-4' />
+                        <span>Edit</span>
                       </DropdownMenuItem>
-                    </button>
-                  </form>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </DialogTrigger>
+                    <form action={deleteTaskById.bind(null, task.id)}>
+                      <button className='w-full' type='submit'>
+                        <DropdownMenuItem>
+                          <Icons.delete className='mr-2 size-4 text-red-500' />
+                          <span className='text-red-500'>Delete</span>
+                        </DropdownMenuItem>
+                      </button>
+                    </form>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <Icons.share className='mr-2 size-4' />
+                      <span>Share link</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <EditTaskForm
+                  taskId={task.id}
+                  title={task.title}
+                  description={task.description}
+                  due={task.due}
+                />
+              </Dialog>
             </li>
           ))}
         </ul>

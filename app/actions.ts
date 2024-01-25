@@ -14,14 +14,18 @@ const doneSchema = z.object({
 
 export const toogle = action(doneSchema, async ({ id, done }) => {
   try {
-    await db.task.update({
+    const task = await db.task.update({
       where: {
         id
       },
       data: {
-        done: !done
+        done
       }
     });
+
+    return {
+      done: task.done
+    };
   } catch (e) {}
 
   revalidatePath('/[username]', 'page');

@@ -60,11 +60,8 @@ export default async function TaskPage({
     <Card className='w-full max-w-[625px]'>
       {task ? (
         <>
-          <CardHeader className='relative'>
+          <CardHeader>
             <CardTitle>{task.title}</CardTitle>
-            {params.username !== sessionUsername && (
-              <Badge className='absolute right-2 top-1'>{`${params.username} shared the task with you 🤝`}</Badge>
-            )}
           </CardHeader>
           <CardContent>
             <div className='grid w-full items-center gap-4'>
@@ -73,6 +70,9 @@ export default async function TaskPage({
                 readOnly
                 value={task.description || 'no description'}
               />
+              {params.username !== sessionUsername && (
+                <Badge className='w-max'>{`${params.username} shared the task with you 🤝`}</Badge>
+              )}
               {!!task.due ? (
                 <time className='flex items-center gap-2 text-sm'>
                   <Icons.calendarClock className='size-4' />

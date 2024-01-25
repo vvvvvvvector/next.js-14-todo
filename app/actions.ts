@@ -23,12 +23,12 @@ export const toogle = action(doneSchema, async ({ id, done }) => {
       }
     });
 
+    revalidatePath('/[username]', 'page');
+
     return {
       done: task.done
     };
   } catch (e) {}
-
-  revalidatePath('/[username]', 'page');
 });
 
 const deleteTaskSchema = z.object({
@@ -37,12 +37,17 @@ const deleteTaskSchema = z.object({
 
 export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
   try {
-    await db.task.delete({
+    const task = await db.task.delete({
       where: {
         id
+      },
+      select: {
+        id: true
       }
     });
-  } catch (e) {}
 
-  revalidatePath('/[username]', 'page');
+    revalidatePath('/[username]', 'page');
+
+    return task;
+  } catch (e) {}
 });

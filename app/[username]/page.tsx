@@ -1,4 +1,6 @@
 import { type Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 
 import { Separator } from '~/components/ui/separator';
@@ -19,15 +21,21 @@ import { EditTaskForm, CreateTaskForm } from '~/components/task-form';
 import { db } from '~/lib/db';
 import { formatDate } from '~/lib/utils';
 import { authOptions } from '~/lib/auth';
+import { PAGES } from '~/lib/constants';
 
 import { deleteTaskById, toogleDoneState } from '~/app/actions';
+import { ShareLinkButton } from '~/components/share-link-button';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
 };
 
-export async function getMyTasks() {
+async function getMyTasks() {
   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect(PAGES.SIGN_IN);
+  }
 
   const tasks = await db.task.findMany({
     where: {
@@ -41,11 +49,17 @@ export async function getMyTasks() {
   return tasks;
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  params
+}: {
+  params: {
+    username: string;
+  };
+}) {
   const tasks = await getMyTasks();
 
   return (
-    <div className='flex w-full max-w-[625px] flex-col gap-6 px-5'>
+    <div className='flex w-full max-w-[625px] flex-col gap-6'>
       <div className='flex items-center justify-between'>
         <span className='font-semibold'>Sort</span>
         <CreateTaskForm />
@@ -57,8 +71,8 @@ export default async function HomePage() {
         <ul className='flex flex-col gap-3 text-sm'>
           {tasks.map((task) => (
             <li
-              className='flex cursor-pointer items-center gap-4 rounded-md border p-4'
               key={task.id}
+              className='flex cursor-pointer items-center gap-2 rounded-md border p-4'
             >
               <Checkbox
                 checked={task.done}
@@ -68,21 +82,26 @@ export default async function HomePage() {
                   !task.done
                 )}
               />
-              <div className='flex flex-1 flex-col gap-2 overflow-hidden'>
-                <h4 className='font-semibold'>{task.title}</h4>
-                <span className='max-h-[20px] overflow-hidden text-ellipsis'>
-                  {!task.description ? 'no description' : task.description}
-                </span>
-                {!!task.due ? (
-                  <time className='flex items-center gap-2'>
-                    <Icons.calendarClock className='size-4' />
-                    <span className='sm:hidden'>{`${formatDate(task.due.toString(), 'short')}`}</span>
-                    <span className='hidden sm:block'>{`${formatDate(task.due.toString())}`}</span>
-                  </time>
-                ) : (
-                  <span>no due date</span>
-                )}
-              </div>
+              <Link
+                className='flex-1 overflow-hidden rounded-md p-2 hover:bg-accent'
+                href={`/${params.username}/${task.id}`}
+              >
+                <div className='flex flex-1 flex-col gap-2'>
+                  <h4 className='font-semibold'>{task.title}</h4>
+                  <span className='max-h-[20px] overflow-hidden text-ellipsis'>
+                    {!task.description ? 'no description' : task.description}
+                  </span>
+                  {!!task.due ? (
+                    <time className='flex items-center gap-2'>
+                      <Icons.calendarClock className='size-4' />
+                      <span className='sm:hidden'>{`${formatDate(task.due.toString(), 'short')}`}</span>
+                      <span className='hidden sm:block'>{`${formatDate(task.due.toString())}`}</span>
+                    </time>
+                  ) : (
+                    <span>no due date</span>
+                  )}
+                </div>
+              </Link>
               <Dialog>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -106,10 +125,10 @@ export default async function HomePage() {
                       </button>
                     </form>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Icons.share className='mr-2 size-4' />
-                      <span>Share link</span>
-                    </DropdownMenuItem>
+                    <ShareLinkButton
+                      username={params.username}
+                      taskId={task.id}
+                    />
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <EditTaskForm

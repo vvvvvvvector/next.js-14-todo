@@ -10,7 +10,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
       <header className='flex justify-end p-5'>
         <SignOutButton />
       </header>
-      <main className='flex justify-center pb-10'>{children}</main>
+      <main className='flex justify-center px-5 pb-10'>{children}</main>
     </div>
   );
 }

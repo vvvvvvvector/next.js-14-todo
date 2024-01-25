@@ -15,9 +15,9 @@ export default function RootPage() {
       <div className='grid gap-4 text-center'>
         <h3 className='text-2xl font-semibold'>Hello 😚</h3>
         <p className='text-sm'>To use the app you need to sign in</p>
-        <Link href={PAGES.SIGN_IN}>
-          <Button>Go to the sign in page</Button>
-        </Link>
+        <Button asChild>
+          <Link href={PAGES.SIGN_IN}>Go to the sign in page</Link>
+        </Button>
       </div>
     </div>
   );

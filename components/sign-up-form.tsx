@@ -14,6 +14,11 @@ import { Button } from '~/components/ui/button';
 
 import { Icons } from '~/components/icons';
 
+const signUpResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+});
+
 const signUpSchema = z
   .object({
     username: z.string().min(1, { message: 'Username is required' }),
@@ -63,10 +68,12 @@ export function SignUpForm() {
 
     const json = await signUpResponse.json(); // probably I can type it using zod
 
-    if (!json.success) {
+    const result = signUpResponseSchema.parse(json);
+
+    if (!result.success) {
       setLoading(false);
 
-      toast.error(json.message);
+      toast.error(result.message);
     } else {
       toast.promise(
         signIn('credentials', {

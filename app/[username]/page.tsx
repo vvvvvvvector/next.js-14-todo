@@ -23,8 +23,8 @@ import { formatDate } from '~/lib/utils';
 import { authOptions } from '~/lib/auth';
 import { PAGES } from '~/lib/constants';
 
-import { deleteTaskById, toogleDoneState } from '~/app/actions';
 import { ShareLinkButton } from '~/components/share-link-button';
+import { DoneCheckbox } from '~/components/done-checkbox';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
@@ -39,7 +39,7 @@ async function getMyTasks() {
 
   const tasks = await db.task.findMany({
     where: {
-      authorId: session?.user.id
+      authorId: session.user.id
     },
     orderBy: {
       createdAt: 'desc'
@@ -74,14 +74,7 @@ export default async function HomePage({
               key={task.id}
               className='flex cursor-pointer items-center gap-2 rounded-md border p-4'
             >
-              <Checkbox
-                checked={task.done}
-                onCheckedChange={toogleDoneState.bind(
-                  null,
-                  task.id,
-                  !task.done
-                )}
-              />
+              <DoneCheckbox id={task.id} done={task.done} />
               <Link
                 className='flex-1 overflow-hidden rounded-md p-2 hover:bg-accent'
                 href={`/${params.username}/${task.id}`}
@@ -116,14 +109,10 @@ export default async function HomePage({
                         <span>Edit</span>
                       </DropdownMenuItem>
                     </DialogTrigger>
-                    <form action={deleteTaskById.bind(null, task.id)}>
-                      <button className='w-full' type='submit'>
-                        <DropdownMenuItem>
-                          <Icons.delete className='mr-2 size-4 text-red-500' />
-                          <span className='text-red-500'>Delete</span>
-                        </DropdownMenuItem>
-                      </button>
-                    </form>
+                    <DropdownMenuItem>
+                      <Icons.delete className='mr-2 size-4 text-red-500' />
+                      <span className='text-red-500'>Delete</span>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <ShareLinkButton
                       username={params.username}

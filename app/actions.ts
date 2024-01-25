@@ -2,24 +2,36 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { db } from '~/lib/db';
+import { z } from 'zod';
 
-export async function toogleDoneState(id: string, done: boolean) {
+import { db } from '~/lib/db';
+import { action } from '~/lib/safe-action';
+
+const doneSchema = z.object({
+  id: z.string(),
+  done: z.boolean()
+});
+
+export const toogle = action(doneSchema, async ({ id, done }) => {
   try {
     await db.task.update({
       where: {
         id
       },
       data: {
-        done
+        done: !done
       }
     });
   } catch (e) {}
 
   revalidatePath('/[username]', 'page');
-}
+});
 
-export async function deleteTaskById(id: string) {
+const deleteTaskSchema = z.object({
+  id: z.string()
+});
+
+export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
   try {
     await db.task.delete({
       where: {
@@ -29,4 +41,4 @@ export async function deleteTaskById(id: string) {
   } catch (e) {}
 
   revalidatePath('/[username]', 'page');
-}
+});

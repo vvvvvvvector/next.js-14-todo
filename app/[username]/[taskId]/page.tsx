@@ -1,3 +1,4 @@
+import { type Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -47,6 +48,10 @@ const getTask = async (username: string, id: string) => {
   });
 
   return task;
+};
+
+export const metadata: Metadata = {
+  title: 'Task page 👀'
 };
 
 export default async function TaskPage({

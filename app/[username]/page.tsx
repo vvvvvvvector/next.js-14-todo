@@ -15,12 +15,13 @@ import { PAGES } from '~/lib/constants';
 
 import { DoneCheckbox } from '~/components/done-checkbox';
 import { TaskMenu } from '~/components/task-menu';
+import { Search } from '~/components/search';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
 };
 
-async function getMyTasks() {
+async function getMyTasks(searchValue: string = '') {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -29,7 +30,19 @@ async function getMyTasks() {
 
   const tasks = await db.task.findMany({
     where: {
-      authorId: session.user.id
+      authorId: session.user.id,
+      OR: [
+        {
+          title: {
+            contains: searchValue
+          }
+        },
+        {
+          description: {
+            contains: searchValue
+          }
+        }
+      ]
     },
     orderBy: {
       createdAt: 'desc'
@@ -47,18 +60,22 @@ async function getMyTasks() {
 }
 
 export default async function HomePage({
-  params
+  params,
+  searchParams
 }: {
   params: {
     username: string;
   };
+  searchParams: {
+    q: string;
+  };
 }) {
-  const tasks = await getMyTasks();
+  const tasks = await getMyTasks(searchParams.q);
 
   return (
     <div className='flex w-full max-w-[625px] flex-col gap-6'>
-      <div className='flex items-center justify-between'>
-        <span className='font-semibold'>Sort</span>
+      <div className='flex items-center justify-between gap-3'>
+        <Search />
         <CreateTaskForm />
       </div>
       <Separator />

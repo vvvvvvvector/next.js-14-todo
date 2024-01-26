@@ -15,6 +15,8 @@ import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
 import { Badge } from '~/components/ui/badge';
 
+import { Comments } from '~/components/comments';
+
 import { authOptions } from '~/lib/auth';
 import { db } from '~/lib/db';
 import { formatDate } from '~/lib/utils';
@@ -27,6 +29,20 @@ const getTask = async (username: string, id: string) => {
         username
       },
       id
+    },
+    include: {
+      comments: {
+        select: {
+          sender: {
+            select: {
+              username: true
+            }
+          },
+          id: true,
+          text: true,
+          createdAt: true
+        }
+      }
     }
   });
 
@@ -55,7 +71,7 @@ export default async function TaskPage({
         <CardTitle>{`${task.title}`}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className='grid w-full items-center gap-4'>
+        <div className='grid w-full items-center gap-4 text-sm'>
           <Textarea
             className='max-h-80 min-h-[150px]'
             readOnly
@@ -76,6 +92,11 @@ export default async function TaskPage({
             )}
             <span>{`Done status: ${task.done ? 'done ✅' : 'in progress ⏳'}`}</span>
           </div>
+          <Comments
+            taskId={task.id}
+            authorId={task.authorId}
+            comments={task.comments}
+          />
         </div>
       </CardContent>
       <CardFooter>

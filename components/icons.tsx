@@ -10,7 +10,8 @@ import {
   Share,
   Square,
   CheckSquare2,
-  MessageCircle
+  MessageCircle,
+  SendHorizontal
 } from 'lucide-react';
 
 export const Icons = {
@@ -25,5 +26,6 @@ export const Icons = {
   share: Share,
   square: Square,
   checkedSquare: CheckSquare2,
-  comments: MessageCircle
+  comments: MessageCircle,
+  send: SendHorizontal
 };

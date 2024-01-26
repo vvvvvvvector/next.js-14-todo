@@ -13,8 +13,8 @@ model User {
     username String @unique
     password String
 
-    tasks   Task[]
-    Comment Comment?
+    tasks    Task[]
+    comments Comment[]
 
     @@map("users")
 }
@@ -28,8 +28,7 @@ model Task {
     createdAt   DateTime  @default(now())
     authorId    String
 
-    author User @relation(fields: [authorId], references: [id])
-
+    author   User      @relation(fields: [authorId], references: [id])
     comments Comment[]
 
     @@index([authorId])
@@ -37,15 +36,17 @@ model Task {
 }
 
 model Comment {
-    id     String @id @default(cuid())
-    text   String
-    taskId String
+    id        String   @id @default(cuid())
+    text      String
+    createdAt DateTime @default(now())
 
-    senderId String @unique
+    senderId String
     sender   User   @relation(fields: [senderId], references: [id])
 
-    task Task @relation(fields: [taskId], references: [id])
+    taskId String
+    task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
     @@index([taskId])
+    @@index([senderId])
     @@map("comments")
 }

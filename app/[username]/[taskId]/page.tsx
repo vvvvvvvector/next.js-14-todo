@@ -94,7 +94,7 @@ export default async function TaskPage({
           </div>
           <Comments
             taskId={task.id}
-            authorId={task.authorId}
+            authorId={session.user.id}
             comments={task.comments}
           />
         </div>

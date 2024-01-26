@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAction } from 'next-safe-action/hooks';
+import { toast } from 'sonner';
 
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
@@ -9,7 +10,8 @@ import { Button } from '~/components/ui/button';
 import { Icons } from '~/components/icons';
 
 import { createComment } from '~/app/actions';
-import { toast } from 'sonner';
+
+import { cn, formatDate, formatTime } from '~/lib/utils';
 
 export function Comments({
   taskId,
@@ -27,6 +29,7 @@ export function Comments({
     createdAt: Date;
   }[];
 }) {
+  const [open, setOpen] = useState(false);
   const [comment, setComment] = useState('');
 
   const { execute, status } = useAction(createComment, {
@@ -42,45 +45,76 @@ export function Comments({
   };
 
   return (
-    <div className='flex flex-col gap-4'>
-      <h4 className='font-bold'>Comments:</h4>
-      <ul className='flex flex-col gap-5'>
-        {comments.map((comment) => (
-          <li key={comment.id}>
-            <div className='flex flex-col gap-1'>
-              <span className='font-semibold'>{comment.sender.username}</span>
-              <span>{comment.text}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <div className='flex gap-4'>
-        <Input
-          value={comment}
-          type='text'
-          placeholder='comment...'
-          onChange={(e) => {
-            setComment(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            const commandOrCtrlPlusEnter =
-              (e.metaKey || e.ctrlKey) && e.key === 'Enter';
-
-            if (commandOrCtrlPlusEnter && comment) {
-              e.preventDefault();
-
-              onSend();
-            }
-          }}
+    <>
+      <button
+        className='flex items-center gap-2'
+        onClick={() => setOpen(!open)}
+      >
+        <span className='font-bold'>Comments</span>
+        <Icons.arrowDown
+          className={cn('size-4 transition-transform duration-500', {
+            '-rotate-180': open
+          })}
         />
-        <Button disabled={status === 'executing'} onClick={onSend} size='icon'>
-          {status === 'executing' ? (
-            <Icons.spinner className='size-4 animate-spin' />
-          ) : (
-            <Icons.send className='size-4' />
-          )}
-        </Button>
-      </div>
-    </div>
+      </button>
+      {open && (
+        <div className='flex flex-col gap-4'>
+          <ul className='flex flex-col gap-5'>
+            {comments.length > 0 ? (
+              <>
+                {comments.map((comment) => (
+                  <li key={comment.id}>
+                    <div className='flex flex-col gap-1'>
+                      <span className='flex justify-between gap-2'>
+                        <span className='font-semibold'>
+                          {comment.sender.username}
+                        </span>
+                        <time
+                          suppressHydrationWarning
+                        >{`${formatDate(comment.createdAt.toString())} at ${formatTime(comment.createdAt.toString())}`}</time>
+                      </span>
+                      <span>{comment.text}</span>
+                    </div>
+                  </li>
+                ))}
+              </>
+            ) : (
+              <li>no comments</li>
+            )}
+          </ul>
+          <div className='flex gap-4'>
+            <Input
+              value={comment}
+              type='text'
+              placeholder='comment...'
+              onChange={(e) => {
+                setComment(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                const commandOrCtrlPlusEnter =
+                  (e.metaKey || e.ctrlKey) && e.key === 'Enter';
+
+                if (commandOrCtrlPlusEnter && comment) {
+                  e.preventDefault();
+
+                  onSend();
+                }
+              }}
+            />
+            <Button
+              disabled={status === 'executing' || comment.length === 0}
+              onClick={onSend}
+              size='icon'
+            >
+              {status === 'executing' ? (
+                <Icons.spinner className='size-4 animate-spin' />
+              ) : (
+                <Icons.send className='size-4' />
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

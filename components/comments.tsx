@@ -50,7 +50,7 @@ export function Comments({
         className='flex items-center gap-2'
         onClick={() => setOpen(!open)}
       >
-        <span className='font-bold'>Comments</span>
+        <span className='font-bold'>{`Comments (${comments.length})`}</span>
         <Icons.arrowDown
           className={cn('size-4 transition-transform duration-500', {
             '-rotate-180': open

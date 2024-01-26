@@ -15,6 +15,7 @@ import { PAGES } from '~/lib/constants';
 
 import { DoneCheckbox } from '~/components/done-checkbox';
 import { TaskMenu } from '~/components/task-menu';
+import { Search } from '~/components/search';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
@@ -27,9 +28,23 @@ async function getMyTasks() {
     redirect(PAGES.SIGN_IN);
   }
 
+  const searchValue = '';
+
   const tasks = await db.task.findMany({
     where: {
-      authorId: session.user.id
+      authorId: session.user.id,
+      OR: [
+        {
+          title: {
+            contains: searchValue
+          }
+        },
+        {
+          description: {
+            contains: searchValue
+          }
+        }
+      ]
     },
     orderBy: {
       createdAt: 'desc'
@@ -57,8 +72,8 @@ export default async function HomePage({
 
   return (
     <div className='flex w-full max-w-[625px] flex-col gap-6'>
-      <div className='flex items-center justify-between'>
-        <span className='font-semibold'>Sort</span>
+      <div className='flex items-center justify-between gap-3'>
+        <Search />
         <CreateTaskForm />
       </div>
       <Separator />

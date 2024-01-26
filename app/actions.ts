@@ -2,11 +2,19 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { db } from '~/lib/db';
+import { z } from 'zod';
 
-export async function toogleDoneState(id: string, done: boolean) {
+import { db } from '~/lib/db';
+import { action } from '~/lib/safe-action';
+
+const doneSchema = z.object({
+  id: z.string(),
+  done: z.boolean()
+});
+
+export const toogle = action(doneSchema, async ({ id, done }) => {
   try {
-    await db.task.update({
+    const task = await db.task.update({
       where: {
         id
       },
@@ -14,19 +22,32 @@ export async function toogleDoneState(id: string, done: boolean) {
         done
       }
     });
+
+    revalidatePath('/[username]', 'page');
+
+    return {
+      done: task.done
+    };
   } catch (e) {}
+});
 
-  revalidatePath('/[username]', 'page');
-}
+const deleteTaskSchema = z.object({
+  id: z.string()
+});
 
-export async function deleteTaskById(id: string) {
+export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
   try {
-    await db.task.delete({
+    const task = await db.task.delete({
       where: {
         id
+      },
+      select: {
+        id: true
       }
     });
-  } catch (e) {}
 
-  revalidatePath('/[username]', 'page');
-}
+    revalidatePath('/[username]', 'page');
+
+    return task;
+  } catch (e) {}
+});

@@ -7,7 +7,9 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  Share
+  Share,
+  Square,
+  CheckSquare2
 } from 'lucide-react';
 
 export const Icons = {
@@ -19,5 +21,7 @@ export const Icons = {
   more: MoreHorizontal,
   edit: Pencil,
   delete: Trash2,
-  share: Share
+  share: Share,
+  square: Square,
+  checkedSquare: CheckSquare2
 };

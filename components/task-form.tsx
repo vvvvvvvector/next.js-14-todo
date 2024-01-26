@@ -180,11 +180,11 @@ export function CreateTaskForm() {
 }
 
 export function EditTaskForm({
-  taskId,
+  id,
   title,
   description,
   due
-}: { taskId: string } & FormData) {
+}: { id: string } & FormData) {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -206,7 +206,7 @@ export function EditTaskForm({
         onSubmit={async (data) => {
           setLoading(true);
 
-          const response = await fetch(`/api/tasks/${taskId}`, {
+          const response = await fetch(`/api/tasks/${id}`, {
             method: 'PATCH',
             body: JSON.stringify({
               title: data.title.trim(),

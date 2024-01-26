@@ -28,7 +28,9 @@ export const toogle = action(doneSchema, async ({ id, done }) => {
     return {
       done: task.done
     };
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 const deleteTaskSchema = z.object({
@@ -49,5 +51,34 @@ export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
     revalidatePath('/[username]', 'page');
 
     return task;
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 });
+
+const createCommentSchema = z.object({
+  taskId: z.string(),
+  authorId: z.string(),
+  text: z.string()
+});
+
+export const createComment = action(
+  createCommentSchema,
+  async ({ taskId, authorId, text }) => {
+    try {
+      const task = await db.comment.create({
+        data: {
+          taskId,
+          senderId: authorId,
+          text
+        }
+      });
+
+      revalidatePath('/[username]/[taskId]', 'page');
+
+      return task;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);

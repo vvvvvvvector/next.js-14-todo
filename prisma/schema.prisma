@@ -13,7 +13,8 @@ model User {
     username String @unique
     password String
 
-    tasks Task[]
+    tasks    Task[]
+    comments Comment[]
 
     @@map("users")
 }
@@ -27,8 +28,25 @@ model Task {
     createdAt   DateTime  @default(now())
     authorId    String
 
-    author User @relation(fields: [authorId], references: [id])
+    author   User      @relation(fields: [authorId], references: [id])
+    comments Comment[]
 
     @@index([authorId])
     @@map("tasks")
+}
+
+model Comment {
+    id        String   @id @default(cuid())
+    text      String
+    createdAt DateTime @default(now())
+
+    senderId String
+    sender   User   @relation(fields: [senderId], references: [id])
+
+    taskId String
+    task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@index([taskId])
+    @@index([senderId])
+    @@map("comments")
 }

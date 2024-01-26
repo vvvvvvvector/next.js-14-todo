@@ -12,3 +12,10 @@ export function formatDate(date: string, month: 'short' | 'long' = 'long') {
     year: 'numeric'
   });
 }
+
+export function formatTime(date: string) {
+  return new Date(date).toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}

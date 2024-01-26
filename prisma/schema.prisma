@@ -13,7 +13,8 @@ model User {
     username String @unique
     password String
 
-    tasks Task[]
+    tasks   Task[]
+    Comment Comment?
 
     @@map("users")
 }
@@ -29,6 +30,22 @@ model Task {
 
     author User @relation(fields: [authorId], references: [id])
 
+    comments Comment[]
+
     @@index([authorId])
     @@map("tasks")
+}
+
+model Comment {
+    id     String @id @default(cuid())
+    text   String
+    taskId String
+
+    senderId String @unique
+    sender   User   @relation(fields: [senderId], references: [id])
+
+    task Task @relation(fields: [taskId], references: [id])
+
+    @@index([taskId])
+    @@map("comments")
 }

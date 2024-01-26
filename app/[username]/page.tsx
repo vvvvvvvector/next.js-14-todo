@@ -33,6 +33,13 @@ async function getMyTasks() {
     },
     orderBy: {
       createdAt: 'desc'
+    },
+    include: {
+      _count: {
+        select: {
+          comments: true
+        }
+      }
     }
   });
 
@@ -82,6 +89,14 @@ export default async function HomePage({
                     </time>
                   ) : (
                     <span>no due date</span>
+                  )}
+                  {task._count.comments > 0 ? (
+                    <span className='flex items-center gap-2'>
+                      <span>{task._count.comments}</span>
+                      <Icons.comments className='size-4' />
+                    </span>
+                  ) : (
+                    <span>no comments</span>
                   )}
                 </div>
               </Link>

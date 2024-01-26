@@ -21,14 +21,12 @@ export const metadata: Metadata = {
   title: 'Home page 🏡'
 };
 
-async function getMyTasks() {
+async function getMyTasks(searchValue: string = '') {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect(PAGES.SIGN_IN);
   }
-
-  const searchValue = '';
 
   const tasks = await db.task.findMany({
     where: {
@@ -62,13 +60,17 @@ async function getMyTasks() {
 }
 
 export default async function HomePage({
-  params
+  params,
+  searchParams
 }: {
   params: {
     username: string;
   };
+  searchParams: {
+    q: string;
+  };
 }) {
-  const tasks = await getMyTasks();
+  const tasks = await getMyTasks(searchParams.q);
 
   return (
     <div className='flex w-full max-w-[625px] flex-col gap-6'>

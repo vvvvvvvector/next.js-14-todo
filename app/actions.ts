@@ -2,11 +2,9 @@
 
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { authOptions } from '~/lib/auth';
-import { PAGES } from '~/lib/constants';
 import { db } from '~/lib/db';
 import { action } from '~/lib/safe-action';
 
@@ -15,8 +13,19 @@ const doneSchema = z.object({
   done: z.boolean()
 });
 
+const SESSION_EXPIRED_MESSAGE =
+  'Your session has expired. To use the app sign in again';
+
 export const toogle = action(doneSchema, async ({ id, done }) => {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return {
+        failure: SESSION_EXPIRED_MESSAGE
+      };
+    }
+
     const task = await db.task.update({
       where: {
         id
@@ -46,6 +55,14 @@ const deleteTaskSchema = z.object({
 
 export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return {
+        failure: SESSION_EXPIRED_MESSAGE
+      };
+    }
+
     const task = await db.task.delete({
       where: {
         id
@@ -79,7 +96,9 @@ export const createComment = action(
       const session = await getServerSession(authOptions);
 
       if (!session) {
-        redirect(PAGES.SIGN_IN); // nothing happens 🤨
+        return {
+          failure: SESSION_EXPIRED_MESSAGE
+        };
       }
 
       const task = await db.comment.create({

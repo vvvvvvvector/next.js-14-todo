@@ -25,10 +25,6 @@ export default withAuth(
 
       return null; // just does nothing -> interrupting middleware further exec. 🤷‍♂️
     }
-
-    if (!isAuthPage) {
-      return Response.redirect(new URL(`${PAGES.SIGN_IN}`, req.url));
-    }
   },
   {
     callbacks: {

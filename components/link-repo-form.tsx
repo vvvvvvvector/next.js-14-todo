@@ -1,8 +1,10 @@
 'use client';
 
+import { useAction } from 'next-safe-action/hooks';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import {
   DialogContent,
@@ -13,7 +15,11 @@ import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 
-const linkRepoSchema = z.object({
+import { Icons } from '~/components/icons';
+
+import { linkRepo } from '~/app/actions';
+
+export const linkRepoSchema = z.object({
   link: z
     .string()
     .min(1, { message: 'There is no link' })
@@ -24,7 +30,18 @@ const linkRepoSchema = z.object({
 
 type FormData = z.infer<typeof linkRepoSchema>;
 
-export function LinkRepoForm() {
+export function LinkRepoForm({ taskId }: { taskId: string }) {
+  const { execute, status } = useAction(linkRepo, {
+    onSuccess: (data) => {
+      if (data && 'failure' in data) {
+        toast.error(data.failure);
+        return;
+      }
+
+      toast.success('GitHub repo was successfully linked');
+    }
+  });
+
   const {
     register,
     handleSubmit,
@@ -40,7 +57,7 @@ export function LinkRepoForm() {
       </DialogHeader>
       <form
         onSubmit={handleSubmit((data) => {
-          console.log(data);
+          execute({ link: data.link, taskId });
         })}
       >
         <div className='grid gap-5'>
@@ -55,7 +72,16 @@ export function LinkRepoForm() {
               <p className='px-1 text-xs text-red-600'>{errors.link.message}</p>
             )}
           </div>
-          <Button type='submit'>Link</Button>
+          <Button disabled={status === 'executing'} type='submit'>
+            {status === 'executing' ? (
+              <div className='flex items-center gap-2'>
+                <Icons.spinner className='size-4 animate-spin' />
+                <span>Loading...</span>
+              </div>
+            ) : (
+              'Link'
+            )}
+          </Button>
         </div>
       </form>
     </DialogContent>

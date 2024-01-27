@@ -121,3 +121,50 @@ export const createComment = action(
     }
   }
 );
+
+const linkRepoSchema = z.object({
+  taskId: z.string(),
+  link: z
+    .string()
+    .min(1, { message: 'There is no link' })
+    .regex(new RegExp('https://github.com/.*/.*'), {
+      message: `It's not a github repo link 😡`
+    })
+});
+
+export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return {
+        failure: SESSION_EXPIRED_MESSAGE
+      };
+    }
+
+    const splitted = link.split('/');
+
+    const repoName = splitted[splitted.length - 1];
+    const ownerName = splitted[splitted.length - 2];
+    const fullName = `${ownerName}/${repoName}`;
+
+    const repo = await db.gitHubLink.create({
+      data: {
+        taskId: taskId,
+        repoName,
+        owner: ownerName,
+        fullName
+      }
+    });
+
+    revalidatePath('/[username]', 'page');
+
+    return repo;
+  } catch (e) {
+    console.log(e);
+
+    return {
+      failure: 'Error occurred while linking the repo!'
+    };
+  }
+});

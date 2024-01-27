@@ -32,6 +32,13 @@ const getTask = async (username: string, id: string) => {
       id
     },
     include: {
+      gh: {
+        select: {
+          owner: true,
+          repoName: true,
+          fullName: true
+        }
+      },
       comments: {
         select: {
           sender: {
@@ -97,6 +104,22 @@ export default async function TaskPage({
             )}
             <span>{`Done status: ${task.done ? 'done ✅' : 'in progress ⏳'}`}</span>
           </div>
+          <div className='flex items-center gap-1'>
+            <Icons.github className='size-4' />
+            {task.gh ? (
+              <Link
+                href={`https://api.github.com/repos/${task.gh.fullName}`}
+                target='_blank'
+              >
+                <span className='font-semibold underline'>
+                  {task.gh.fullName}
+                </span>
+              </Link>
+            ) : (
+              <span>no linked repo</span>
+            )}
+          </div>
+
           <Comments taskId={task.id} comments={task.comments} />
         </div>
       </CardContent>

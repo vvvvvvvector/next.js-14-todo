@@ -48,6 +48,11 @@ async function getMyTasks(searchValue: string = '') {
       createdAt: 'desc'
     },
     include: {
+      gh: {
+        select: {
+          fullName: true
+        }
+      },
       _count: {
         select: {
           comments: true
@@ -107,10 +112,18 @@ export default async function HomePage({
                   ) : (
                     <span>no due date</span>
                   )}
+                  {task.gh ? (
+                    <span className='flex items-center gap-1'>
+                      <Icons.github className='size-4' />
+                      <span className='font-semibold'>{task.gh.fullName}</span>
+                    </span>
+                  ) : (
+                    <span>no linked repo</span>
+                  )}
                   {task._count.comments > 0 ? (
-                    <span className='flex items-center gap-2'>
-                      <span>{task._count.comments}</span>
+                    <span className='flex items-center gap-1'>
                       <Icons.comments className='size-4' />
+                      <span>{task._count.comments}</span>
                     </span>
                   ) : (
                     <span>no comments</span>

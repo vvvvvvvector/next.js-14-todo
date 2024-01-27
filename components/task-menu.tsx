@@ -110,7 +110,7 @@ export function TaskMenu({
           due={due}
         />
       )}
-      {dialog === 'gh-link' && <LinkRepoForm />}
+      {dialog === 'gh-link' && <LinkRepoForm taskId={id} />}
     </Dialog>
   );
 }

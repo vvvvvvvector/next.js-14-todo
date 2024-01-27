@@ -31,8 +31,23 @@ model Task {
     author   User      @relation(fields: [authorId], references: [id])
     comments Comment[]
 
+    gh GitHubLink?
+
     @@index([authorId])
     @@map("tasks")
+}
+
+model GitHubLink {
+    id       Int    @id @default(autoincrement())
+    owner    String
+    repoName String @map("repo_name")
+    fullName String @map("full_name")
+
+    taskId String @unique
+
+    task Task @relation(fields: [taskId], references: [id])
+
+    @@map("gh_link")
 }
 
 model Comment {

@@ -30,6 +30,10 @@ export const toogle = action(doneSchema, async ({ id, done }) => {
     };
   } catch (e) {
     console.log(e);
+
+    return {
+      failure: 'Error occurred while toggling the done state!'
+    };
   }
 });
 

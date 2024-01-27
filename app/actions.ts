@@ -57,6 +57,10 @@ export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
     return task;
   } catch (e) {
     console.log(e);
+
+    return {
+      failure: 'Error occurred while deleting the task!'
+    };
   }
 });
 

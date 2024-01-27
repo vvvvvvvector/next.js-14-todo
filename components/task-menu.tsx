@@ -35,7 +35,12 @@ export function TaskMenu({
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { execute, status } = useAction(deleteTask, {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data && 'failure' in data) {
+        toast.error(data.failure);
+        return;
+      }
+
       setMenuOpen(false);
 
       toast.success('Task was successfully deleted');

@@ -1,11 +1,11 @@
 'use client';
 
+import { toast } from 'sonner';
 import { useAction } from 'next-safe-action/hooks';
 
 import { Icons } from '~/components/icons';
 
 import { toogle } from '~/app/actions';
-import { toast } from 'sonner';
 
 export function DoneCheckbox({ id, done }: { id: string; done: boolean }) {
   const { execute, status, result } = useAction(toogle, {

@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     return Response.json({
       success: true,
-      message: 'A new task was successfully created!'
+      message: 'A new task was successfully created'
     });
   } catch (e) {
     return Response.json({

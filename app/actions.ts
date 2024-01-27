@@ -1,9 +1,10 @@
 'use server';
 
+import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
-
 import { z } from 'zod';
 
+import { authOptions } from '~/lib/auth';
 import { db } from '~/lib/db';
 import { action } from '~/lib/safe-action';
 
@@ -12,8 +13,19 @@ const doneSchema = z.object({
   done: z.boolean()
 });
 
+const SESSION_EXPIRED_MESSAGE =
+  'Your session has expired. To use the app sign in again';
+
 export const toogle = action(doneSchema, async ({ id, done }) => {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return {
+        failure: SESSION_EXPIRED_MESSAGE
+      };
+    }
+
     const task = await db.task.update({
       where: {
         id
@@ -43,6 +55,14 @@ const deleteTaskSchema = z.object({
 
 export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return {
+        failure: SESSION_EXPIRED_MESSAGE
+      };
+    }
+
     const task = await db.task.delete({
       where: {
         id
@@ -66,18 +86,25 @@ export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
 
 const createCommentSchema = z.object({
   taskId: z.string(),
-  authorId: z.string(),
   text: z.string()
 });
 
 export const createComment = action(
   createCommentSchema,
-  async ({ taskId, authorId, text }) => {
+  async ({ taskId, text }) => {
     try {
+      const session = await getServerSession(authOptions);
+
+      if (!session) {
+        return {
+          failure: SESSION_EXPIRED_MESSAGE
+        };
+      }
+
       const task = await db.comment.create({
         data: {
           taskId,
-          senderId: authorId,
+          senderId: session.user.id,
           text
         }
       });

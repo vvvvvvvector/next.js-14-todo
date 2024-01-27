@@ -97,11 +97,7 @@ export default async function TaskPage({
             )}
             <span>{`Done status: ${task.done ? 'done ✅' : 'in progress ⏳'}`}</span>
           </div>
-          <Comments
-            taskId={task.id}
-            authorId={session.user.id}
-            comments={task.comments}
-          />
+          <Comments taskId={task.id} comments={task.comments} />
         </div>
       </CardContent>
       <CardFooter>

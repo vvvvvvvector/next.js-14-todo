@@ -25,7 +25,10 @@ export async function PATCH(
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return new Response('Unauthorized', { status: 403 });
+      return Response.json({
+        success: false,
+        message: 'Your session has expired. To use the app sign in again'
+      });
     }
 
     const { params } = routeContextSchema.parse(context);
@@ -44,8 +47,14 @@ export async function PATCH(
       }
     });
 
-    return new Response(null, { status: 200 });
+    return Response.json({
+      success: true,
+      message: 'The task was successfully updated'
+    });
   } catch (e) {
-    return new Response(null, { status: 500 });
+    return Response.json({
+      success: false,
+      message: 'Error occured while updating the task!'
+    });
   }
 }

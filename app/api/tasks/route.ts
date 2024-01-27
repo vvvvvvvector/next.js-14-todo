@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return new Response('Unauthorized', { status: 403 });
+      return Response.json({
+        success: false,
+        message: 'Your session has expired. To use the app sign in again'
+      });
     }
 
     const json = await request.json();
@@ -31,8 +34,14 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return new Response(null, { status: 200 });
+    return Response.json({
+      success: true,
+      message: 'A new task was successfully created'
+    });
   } catch (e) {
-    return new Response(null, { status: 500 });
+    return Response.json({
+      success: false,
+      message: 'Error occured while create a task!'
+    });
   }
 }

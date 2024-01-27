@@ -93,7 +93,7 @@ export function SignUpForm() {
           error: () => {
             setLoading(false);
 
-            return 'Error occured while signin in to your account';
+            return 'Error occured while signing in to your account!';
           }
         }
       );

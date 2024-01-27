@@ -119,6 +119,11 @@ function Form({
   );
 }
 
+const createTaskResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+});
+
 export function CreateTaskForm() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -152,15 +157,19 @@ export function CreateTaskForm() {
               })
             });
 
-            console.log(response);
+            const json = createTaskResponseSchema.parse(await response.json());
 
             setLoading(false);
 
-            setOpen(false);
+            if (json.success) {
+              setOpen(false);
 
-            router.refresh();
+              router.refresh();
 
-            toast.success('A new task was successfully created!');
+              toast.success(json.message);
+            } else {
+              toast.error(json.message);
+            }
           }}
         >
           <Button disabled={loading} type='submit'>
@@ -178,6 +187,11 @@ export function CreateTaskForm() {
     </Dialog>
   );
 }
+
+const editTaskResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+});
 
 export function EditTaskForm({
   id,
@@ -215,13 +229,17 @@ export function EditTaskForm({
             })
           });
 
-          console.log(response);
+          const json = editTaskResponseSchema.parse(await response.json());
 
           setLoading(false);
 
-          router.refresh();
+          if (json.success) {
+            router.refresh();
 
-          toast.success('The task was successfully updated!');
+            toast.success(json.message);
+          } else {
+            toast.error(json.message);
+          }
         }}
       >
         <Button disabled={loading} type='submit'>

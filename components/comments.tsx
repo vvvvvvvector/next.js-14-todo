@@ -15,11 +15,9 @@ import { cn, formatDate, formatTime } from '~/lib/utils';
 
 export function Comments({
   taskId,
-  authorId,
   comments
 }: {
   taskId: string;
-  authorId: string;
   comments: {
     id: string;
     sender: {
@@ -44,7 +42,7 @@ export function Comments({
   });
 
   const onSend = () => {
-    execute({ text: comment, taskId, authorId });
+    execute({ text: comment, taskId });
 
     setComment('');
   };

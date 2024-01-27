@@ -1,9 +1,12 @@
 'use server';
 
+import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
-
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+import { authOptions } from '~/lib/auth';
+import { PAGES } from '~/lib/constants';
 import { db } from '~/lib/db';
 import { action } from '~/lib/safe-action';
 
@@ -66,18 +69,23 @@ export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
 
 const createCommentSchema = z.object({
   taskId: z.string(),
-  authorId: z.string(),
   text: z.string()
 });
 
 export const createComment = action(
   createCommentSchema,
-  async ({ taskId, authorId, text }) => {
+  async ({ taskId, text }) => {
     try {
+      const session = await getServerSession(authOptions);
+
+      if (!session) {
+        redirect(PAGES.SIGN_IN); // nothing happens 🤨
+      }
+
       const task = await db.comment.create({
         data: {
           taskId,
-          senderId: authorId,
+          senderId: session.user.id,
           text
         }
       });

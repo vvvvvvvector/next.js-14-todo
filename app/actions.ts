@@ -87,6 +87,10 @@ export const createComment = action(
       return task;
     } catch (e) {
       console.log(e);
+
+      return {
+        failure: 'Error occurred while creating the comment!'
+      };
     }
   }
 );

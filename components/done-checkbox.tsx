@@ -12,6 +12,7 @@ export function DoneCheckbox({ id, done }: { id: string; done: boolean }) {
     onSuccess: (data) => {
       if (data && 'failure' in data) {
         toast.error(data.failure);
+        return;
       }
     }
   });

@@ -148,14 +148,35 @@ export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
     const ownerName = splitted[splitted.length - 2];
     const fullName = `${ownerName}/${repoName}`;
 
-    const repo = await db.gitHubLink.create({
-      data: {
-        taskId: taskId,
-        repoName,
-        owner: ownerName,
-        fullName
+    const exists = await db.gitHubLink.findUnique({
+      where: {
+        taskId
       }
     });
+
+    let repo;
+
+    if (exists) {
+      repo = await db.gitHubLink.update({
+        where: {
+          taskId
+        },
+        data: {
+          repoName,
+          owner: ownerName,
+          fullName
+        }
+      });
+    } else {
+      repo = await db.gitHubLink.create({
+        data: {
+          taskId: taskId,
+          repoName,
+          owner: ownerName,
+          fullName
+        }
+      });
+    }
 
     revalidatePath('/[username]', 'page');
 

@@ -33,7 +33,12 @@ export function Comments({
   const [comment, setComment] = useState('');
 
   const { execute, status } = useAction(createComment, {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data && 'failure' in data) {
+        toast.error(data.failure);
+        return;
+      }
+
       toast.success('Comment was successfully sent');
     }
   });

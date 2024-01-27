@@ -30,6 +30,10 @@ export const toogle = action(doneSchema, async ({ id, done }) => {
     };
   } catch (e) {
     console.log(e);
+
+    return {
+      failure: 'Error occurred while toggling the done state!'
+    };
   }
 });
 
@@ -53,6 +57,10 @@ export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
     return task;
   } catch (e) {
     console.log(e);
+
+    return {
+      failure: 'Error occurred while deleting the task!'
+    };
   }
 });
 
@@ -79,6 +87,10 @@ export const createComment = action(
       return task;
     } catch (e) {
       console.log(e);
+
+      return {
+        failure: 'Error occurred while creating the comment!'
+      };
     }
   }
 );

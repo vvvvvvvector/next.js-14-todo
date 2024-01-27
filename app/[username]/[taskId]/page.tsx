@@ -107,10 +107,7 @@ export default async function TaskPage({
           <div className='flex items-center gap-1'>
             <Icons.github className='size-4' />
             {task.gh ? (
-              <Link
-                href={`https://api.github.com/repos/${task.gh.fullName}`}
-                target='_blank'
-              >
+              <Link href={`/${params.username}/${params.taskId}/gh`}>
                 <span className='font-semibold underline'>
                   {task.gh.fullName}
                 </span>

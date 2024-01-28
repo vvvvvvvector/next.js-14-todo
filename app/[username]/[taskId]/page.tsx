@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { Icons } from '~/components/icons';
-
 import {
   Card,
   CardContent,
@@ -17,6 +15,7 @@ import { Textarea } from '~/components/ui/textarea';
 import { Badge } from '~/components/ui/badge';
 
 import { Comments } from '~/components/comments';
+import { Icons } from '~/components/icons';
 
 import { authOptions } from '~/lib/auth';
 import { db } from '~/lib/db';
@@ -32,6 +31,13 @@ const getTask = async (username: string, id: string) => {
       id
     },
     include: {
+      gh: {
+        select: {
+          owner: true,
+          repoName: true,
+          fullName: true
+        }
+      },
       comments: {
         select: {
           sender: {
@@ -71,7 +77,7 @@ export default async function TaskPage({
   if (!task) notFound();
 
   return (
-    <Card className='w-full max-w-[625px]'>
+    <Card className='w-full max-w-[650px]'>
       <CardHeader>
         <CardTitle>{`${task.title}`}</CardTitle>
       </CardHeader>
@@ -85,7 +91,7 @@ export default async function TaskPage({
           {params.username !== session.user.username && (
             <Badge className='w-max'>{`${params.username} shared the task with you 🤝`}</Badge>
           )}
-          <div className='flex items-center justify-between text-sm'>
+          <div className='flex items-center justify-between text-sm max-[350px]:flex-col max-[350px]:items-start max-[350px]:gap-4'>
             {!!task.due ? (
               <time className='flex items-center gap-2 '>
                 <Icons.calendarClock className='size-4' />
@@ -97,6 +103,22 @@ export default async function TaskPage({
             )}
             <span>{`Done status: ${task.done ? 'done ✅' : 'in progress ⏳'}`}</span>
           </div>
+          <div className='flex items-center gap-1 overflow-hidden'>
+            <Icons.github className='size-4 flex-shrink-0' />
+            {task.gh ? (
+              <Link
+                className='overflow-hidden text-ellipsis text-nowrap '
+                href={`/${params.username}/${params.taskId}/gh`}
+              >
+                <span className='font-semibold underline'>
+                  {task.gh.fullName}
+                </span>
+              </Link>
+            ) : (
+              <span>no linked repo</span>
+            )}
+          </div>
+
           <Comments taskId={task.id} comments={task.comments} />
         </div>
       </CardContent>

@@ -6,6 +6,7 @@ import { useAction } from 'next-safe-action/hooks';
 
 import { Icons } from '~/components/icons';
 import { EditTaskForm } from '~/components/task-form';
+import { LinkRepoForm } from '~/components/link-repo-form';
 
 import { Button } from '~/components/ui/button';
 import { Dialog, DialogTrigger } from '~/components/ui/dialog';
@@ -34,6 +35,8 @@ export function TaskMenu({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const [dialog, setDialog] = useState<'edit' | 'gh-link'>('edit');
+
   const { execute, status } = useAction(deleteTask, {
     onSuccess: (data) => {
       if (data && 'failure' in data) {
@@ -56,10 +59,16 @@ export function TaskMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DialogTrigger asChild>
+          <DialogTrigger onClick={() => setDialog('edit')} asChild>
             <DropdownMenuItem>
               <Icons.edit className='mr-2 size-4' />
               <span>Edit</span>
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogTrigger onClick={() => setDialog('gh-link')} asChild>
+            <DropdownMenuItem>
+              <Icons.link className='mr-2 size-4' />
+              <span>Link repo</span>
             </DropdownMenuItem>
           </DialogTrigger>
           <DropdownMenuItem
@@ -93,7 +102,15 @@ export function TaskMenu({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <EditTaskForm id={id} title={title} description={description} due={due} />
+      {dialog === 'edit' && (
+        <EditTaskForm
+          id={id}
+          title={title}
+          description={description}
+          due={due}
+        />
+      )}
+      {dialog === 'gh-link' && <LinkRepoForm taskId={id} />}
     </Dialog>
   );
 }

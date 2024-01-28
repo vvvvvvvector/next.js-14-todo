@@ -8,11 +8,12 @@ An open source application built using [Next.js 14](https://nextjs.org/).
 
 - Authentication (using username & password) / Registration
 - Task have a title, description, done state and due date field
-- User can see the list of the tasks
-- User can filter the tasks by name & description
-- User can create / modify / delete a task
+- Users can see the list of the tasks
+- Users can filter the tasks by name & description
+- Users can create / modify / delete a task
 - Users can share their tasks via URL
 - Users can add comments to the task
+- Users can link a public GitHub repo to a task. There is a route where users can view some metadata of the repo
 
 ## Technology stack
 

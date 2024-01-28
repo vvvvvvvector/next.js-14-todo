@@ -5,9 +5,6 @@ import { getServerSession } from 'next-auth';
 
 import { Separator } from '~/components/ui/separator';
 
-import { Icons } from '~/components/icons';
-import { CreateTaskForm } from '~/components/task-form';
-
 import { db } from '~/lib/db';
 import { formatDate } from '~/lib/utils';
 import { authOptions } from '~/lib/auth';
@@ -16,6 +13,8 @@ import { PAGES } from '~/lib/constants';
 import { DoneCheckbox } from '~/components/done-checkbox';
 import { TaskMenu } from '~/components/task-menu';
 import { Search } from '~/components/search';
+import { Icons } from '~/components/icons';
+import { CreateTaskForm } from '~/components/task-form';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
@@ -48,6 +47,11 @@ async function getMyTasks(searchValue: string = '') {
       createdAt: 'desc'
     },
     include: {
+      gh: {
+        select: {
+          fullName: true
+        }
+      },
       _count: {
         select: {
           comments: true
@@ -73,7 +77,7 @@ export default async function HomePage({
   const tasks = await getMyTasks(searchParams.q);
 
   return (
-    <div className='flex w-full max-w-[625px] flex-col gap-6'>
+    <div className='flex w-full max-w-[650px] flex-col gap-6'>
       <div className='flex items-center justify-between gap-3'>
         <Search />
         <CreateTaskForm />
@@ -86,31 +90,41 @@ export default async function HomePage({
           {tasks.map((task) => (
             <li
               key={task.id}
-              className='flex cursor-pointer items-center gap-2 rounded-md border p-4'
+              className='flex items-center gap-2 rounded-md border p-3'
             >
               <DoneCheckbox id={task.id} done={task.done} />
               <Link
                 className='flex-1 overflow-hidden rounded-md p-2 hover:bg-accent'
                 href={`/${params.username}/${task.id}`}
               >
-                <div className='flex flex-1 flex-col gap-2'>
+                <div className='flex flex-1 flex-col gap-1'>
                   <h4 className='font-semibold'>{task.title}</h4>
                   <span className='max-h-[20px] overflow-hidden text-ellipsis'>
                     {task.description || 'no description'}
                   </span>
                   {!!task.due ? (
-                    <time className='flex items-center gap-2'>
-                      <Icons.calendarClock className='size-4' />
+                    <time className='flex items-center gap-1'>
+                      <Icons.calendarClock className='size-4 flex-shrink-0' />
                       <span className='sm:hidden'>{`${formatDate(task.due.toString(), 'short')}`}</span>
                       <span className='hidden sm:block'>{`${formatDate(task.due.toString())}`}</span>
                     </time>
                   ) : (
                     <span>no due date</span>
                   )}
+                  {task.gh ? (
+                    <span className='flex items-center gap-1'>
+                      <Icons.github className='size-4 flex-shrink-0' />
+                      <span className='overflow-hidden text-ellipsis text-nowrap'>
+                        {task.gh.fullName}
+                      </span>
+                    </span>
+                  ) : (
+                    <span>no linked repo</span>
+                  )}
                   {task._count.comments > 0 ? (
-                    <span className='flex items-center gap-2'>
-                      <span>{task._count.comments}</span>
+                    <span className='flex items-center gap-1'>
                       <Icons.comments className='size-4' />
+                      <span>{task._count.comments}</span>
                     </span>
                   ) : (
                     <span>no comments</span>

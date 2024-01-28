@@ -12,7 +12,9 @@ import {
   CheckSquare2,
   MessageCircle,
   SendHorizontal,
-  ChevronDown
+  ChevronDown,
+  Github,
+  Link
 } from 'lucide-react';
 
 export const Icons = {
@@ -29,5 +31,7 @@ export const Icons = {
   checkedSquare: CheckSquare2,
   comments: MessageCircle,
   send: SendHorizontal,
-  arrowDown: ChevronDown
+  arrowDown: ChevronDown,
+  github: Github,
+  link: Link
 };

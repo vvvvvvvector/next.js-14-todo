@@ -31,8 +31,23 @@ model Task {
     author   User      @relation(fields: [authorId], references: [id])
     comments Comment[]
 
+    gh Repo?
+
     @@index([authorId])
     @@map("tasks")
+}
+
+model Repo {
+    id       Int    @id @default(autoincrement())
+    owner    String
+    repoName String @map("repo_name")
+    fullName String @map("full_name")
+
+    taskId String @unique
+
+    task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@map("gh_links")
 }
 
 model Comment {

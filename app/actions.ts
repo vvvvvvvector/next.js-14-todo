@@ -148,7 +148,7 @@ export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
     const ownerName = splitted[splitted.length - 2];
     const fullName = `${ownerName}/${repoName}`;
 
-    const exists = await db.gitHubLink.findUnique({
+    const linked = await db.repo.count({
       where: {
         taskId
       }
@@ -156,8 +156,8 @@ export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
 
     let repo;
 
-    if (exists) {
-      repo = await db.gitHubLink.update({
+    if (linked) {
+      repo = await db.repo.update({
         where: {
           taskId
         },
@@ -168,7 +168,7 @@ export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
         }
       });
     } else {
-      repo = await db.gitHubLink.create({
+      repo = await db.repo.create({
         data: {
           taskId: taskId,
           repoName,

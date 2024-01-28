@@ -24,20 +24,20 @@ export function DoneCheckbox({ id, done }: { id: string; done: boolean }) {
   return (
     <>
       {status === 'executing' ? (
-        <Icons.spinner className='size-5 animate-spin' />
+        <Icons.spinner className='size-6 animate-spin' />
       ) : d ? (
         <Icons.checkedSquare
           onClick={() => {
             execute({ id, done: false });
           }}
-          className='size-5'
+          className='size-6 cursor-pointer'
         />
       ) : (
         <Icons.square
           onClick={() => {
             execute({ id, done: true });
           }}
-          className='size-5'
+          className='size-6 cursor-pointer'
         />
       )}
     </>

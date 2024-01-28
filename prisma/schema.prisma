@@ -31,13 +31,13 @@ model Task {
     author   User      @relation(fields: [authorId], references: [id])
     comments Comment[]
 
-    gh GitHubLink?
+    gh Repo?
 
     @@index([authorId])
     @@map("tasks")
 }
 
-model GitHubLink {
+model Repo {
     id       Int    @id @default(autoincrement())
     owner    String
     repoName String @map("repo_name")
@@ -45,9 +45,9 @@ model GitHubLink {
 
     taskId String @unique
 
-    task Task @relation(fields: [taskId], references: [id])
+    task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-    @@map("gh_link")
+    @@map("gh_links")
 }
 
 model Comment {

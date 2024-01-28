@@ -131,7 +131,7 @@ export default async function HomePage({
                   )}
                 </div>
               </Link>
-              <TaskMenu {...task} username={params.username} />
+              <TaskMenu {...task} />
             </li>
           ))}
         </ul>

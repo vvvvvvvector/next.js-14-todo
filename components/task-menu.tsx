@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useAction } from 'next-safe-action/hooks';
+import { useParams } from 'next/navigation';
 
 import { Icons } from '~/components/icons';
 import { EditTaskForm } from '~/components/task-form';
@@ -21,18 +22,18 @@ import {
 import { deleteTask } from '~/app/actions';
 
 export function TaskMenu({
-  username,
   id,
   title,
   description,
   due
 }: {
-  username: string;
   id: string;
   title: string;
   description: string | null;
   due: Date | null;
 }) {
+  const params = useParams();
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [dialog, setDialog] = useState<'edit' | 'gh-link'>('edit');
@@ -91,7 +92,7 @@ export function TaskMenu({
           <DropdownMenuItem
             onClick={() => {
               navigator.clipboard.writeText(
-                `${process.env.NEXT_PUBLIC_APP_URL}/${username}/${id}`
+                `${process.env.NEXT_PUBLIC_APP_URL}/${params.username}/${id}`
               );
 
               toast.info('The link is copied to the clipboard');
@@ -110,7 +111,7 @@ export function TaskMenu({
           due={due}
         />
       )}
-      {dialog === 'gh-link' && <LinkRepoForm taskId={id} />}
+      {dialog === 'gh-link' && <LinkRepoForm id={id} />}
     </Dialog>
   );
 }

@@ -1,16 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
 import { Button } from '~/components/ui/button';
 
-export function TaskNotFound() {
-  const params = useParams();
+import { PAGES } from '~/lib/constants';
 
+export function TaskNotFound() {
   return (
     <Button asChild>
-      <Link href={`/${params.username}`}>Return home</Link>
+      <Link href={PAGES.SIGN_IN}>Return home</Link>
     </Button>
   );
 }

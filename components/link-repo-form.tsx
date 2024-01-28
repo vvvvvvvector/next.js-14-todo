@@ -30,7 +30,7 @@ export const linkRepoSchema = z.object({
 
 type FormData = z.infer<typeof linkRepoSchema>;
 
-export function LinkRepoForm({ taskId }: { taskId: string }) {
+export function LinkRepoForm({ id }: { id: string }) {
   const { execute, status } = useAction(linkRepo, {
     onSuccess: (data) => {
       if (data && 'failure' in data) {
@@ -57,7 +57,7 @@ export function LinkRepoForm({ taskId }: { taskId: string }) {
       </DialogHeader>
       <form
         onSubmit={handleSubmit((data) => {
-          execute({ link: data.link, taskId });
+          execute({ link: data.link, taskId: id });
         })}
       >
         <div className='grid gap-5'>

@@ -118,8 +118,7 @@ export default async function TaskPage({
               <span>no linked repo</span>
             )}
           </div>
-
-          <Comments taskId={task.id} comments={task.comments} />
+          <Comments id={task.id} comments={task.comments} />
         </div>
       </CardContent>
       <CardFooter>

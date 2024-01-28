@@ -14,17 +14,17 @@ import { createComment } from '~/app/actions';
 import { cn, formatDate, formatTime } from '~/lib/utils';
 
 export function Comments({
-  taskId,
+  id,
   comments
 }: {
-  taskId: string;
+  id: string;
   comments: {
     id: string;
+    text: string;
+    createdAt: Date;
     sender: {
       username: string;
     };
-    text: string;
-    createdAt: Date;
   }[];
 }) {
   const [open, setOpen] = useState(false);
@@ -42,7 +42,7 @@ export function Comments({
   });
 
   const onSend = () => {
-    execute({ text: comment, taskId });
+    execute({ text: comment, taskId: id });
 
     setComment('');
   };

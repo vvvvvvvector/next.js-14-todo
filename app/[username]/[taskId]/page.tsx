@@ -26,7 +26,7 @@ const getTask = async (username: string, id: string) => {
   const task = await db.task.findUnique({
     where: {
       author: {
-        username
+        username: decodeURIComponent(username)
       },
       id
     },
@@ -88,8 +88,8 @@ export default async function TaskPage({
             readOnly
             value={task.description || 'no description'}
           />
-          {params.username !== session.user.username && (
-            <Badge className='w-max'>{`${params.username} shared the task with you 🤝`}</Badge>
+          {decodeURIComponent(params.username) !== session.user.username && (
+            <Badge className='w-max'>{`${decodeURIComponent(params.username)} shared the task with you 🤝`}</Badge>
           )}
           <div className='flex items-center justify-between text-sm max-[350px]:flex-col max-[350px]:items-start max-[350px]:gap-4'>
             {!!task.due ? (

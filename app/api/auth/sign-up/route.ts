@@ -34,6 +34,8 @@ export async function POST(request: Request) {
       message: 'User was successfully created.'
     });
   } catch (e) {
+    console.log(e);
+
     return Response.json({
       success: false,
       message: 'Error occured while signing up!'

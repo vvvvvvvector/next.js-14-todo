@@ -88,7 +88,7 @@ export default async function TaskPage({
             readOnly
             value={task.description || 'no description'}
           />
-          {params.username !== session.user.username && (
+          {decodeURIComponent(params.username) !== session.user.username && (
             <Badge className='w-max'>{`${decodeURIComponent(params.username)} shared the task with you 🤝`}</Badge>
           )}
           <div className='flex items-center justify-between text-sm max-[350px]:flex-col max-[350px]:items-start max-[350px]:gap-4'>

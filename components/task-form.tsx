@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -194,11 +194,15 @@ const editTaskResponseSchema = z.object({
 });
 
 export function EditTaskForm({
+  setDialogOpen,
   id,
   title,
   description,
   due
-}: { id: string } & FormData) {
+}: {
+  id: string;
+  setDialogOpen: Dispatch<SetStateAction<boolean>>;
+} & FormData) {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -235,6 +239,8 @@ export function EditTaskForm({
 
           if (json.success) {
             router.refresh();
+
+            setDialogOpen(false);
 
             toast.success(json.message);
           } else {

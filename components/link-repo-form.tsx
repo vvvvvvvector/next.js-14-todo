@@ -1,5 +1,6 @@
 'use client';
 
+import type { Dispatch, SetStateAction } from 'react';
 import { useAction } from 'next-safe-action/hooks';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -30,13 +31,23 @@ export const linkRepoSchema = z.object({
 
 type FormData = z.infer<typeof linkRepoSchema>;
 
-export function LinkRepoForm({ id }: { id: string }) {
+export function LinkRepoForm({
+  id,
+  setDialogOpen
+}: {
+  id: string;
+  setDialogOpen: Dispatch<SetStateAction<boolean>>;
+}) {
   const { execute, status } = useAction(linkRepo, {
     onSuccess: (data) => {
       if (data && 'failure' in data) {
         toast.error(data.failure);
         return;
       }
+
+      setDialogOpen(false);
+
+      reset();
 
       toast.success('GitHub repo was successfully linked');
     }
@@ -45,6 +56,7 @@ export function LinkRepoForm({ id }: { id: string }) {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormData>({
     resolver: zodResolver(linkRepoSchema)

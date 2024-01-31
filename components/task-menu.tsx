@@ -34,6 +34,7 @@ export function TaskMenu({
 }) {
   const params = useParams();
 
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [dialog, setDialog] = useState<'edit' | 'gh-link'>('edit');
@@ -52,7 +53,7 @@ export function TaskMenu({
   });
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' size='icon'>
@@ -105,13 +106,16 @@ export function TaskMenu({
       </DropdownMenu>
       {dialog === 'edit' && (
         <EditTaskForm
+          setDialogOpen={setDialogOpen}
           id={id}
           title={title}
           description={description}
           due={due}
         />
       )}
-      {dialog === 'gh-link' && <LinkRepoForm id={id} />}
+      {dialog === 'gh-link' && (
+        <LinkRepoForm setDialogOpen={setDialogOpen} id={id} />
+      )}
     </Dialog>
   );
 }

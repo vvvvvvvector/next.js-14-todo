@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,6 +45,8 @@ type FormData = z.infer<typeof signUpSchema>;
 export function SignUpForm() {
   const [loading, setLoading] = useState(false);
 
+  const [isPending, startTransition] = useTransition();
+
   const router = useRouter();
 
   const {
@@ -86,7 +88,9 @@ export function SignUpForm() {
           success: () => {
             setLoading(false);
 
-            router.push(`/${data.username}`);
+            startTransition(() => {
+              router.push(`/${data.username}`);
+            });
 
             return 'Successfully signed up';
           },
@@ -150,8 +154,8 @@ export function SignUpForm() {
             </p>
           )}
         </div>
-        <Button disabled={loading}>
-          {loading ? (
+        <Button disabled={loading || isPending}>
+          {loading || isPending ? (
             <div className='flex items-center gap-2'>
               <Icons.spinner className='size-4 animate-spin' />
               <span>Loading...</span>

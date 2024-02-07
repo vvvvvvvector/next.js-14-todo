@@ -87,9 +87,10 @@ export function Comments({
           </ul>
           <div className='flex gap-4'>
             <Input
-              value={comment}
               type='text'
-              placeholder='comment...'
+              className='flex-1'
+              placeholder='Your comment...'
+              value={comment}
               onChange={(e) => {
                 setComment(e.target.value);
               }}

@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { type Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
@@ -22,7 +23,7 @@ import { db } from '~/lib/db';
 import { formatDate } from '~/lib/utils';
 import { PAGES } from '~/lib/constants';
 
-const getTask = async (username: string, id: string) => {
+const getTask = cache(async (username: string, id: string) => {
   const task = await db.task.findUnique({
     where: {
       author: {
@@ -54,20 +55,26 @@ const getTask = async (username: string, id: string) => {
   });
 
   return task;
-};
+});
 
-export const metadata: Metadata = {
-  title: 'Task page 👀'
-};
-
-export default async function TaskPage({
-  params
-}: {
+interface Props {
   params: {
     username: string;
     taskId: string;
   };
-}) {
+}
+
+export async function generateMetadata({ params }: Props) {
+  const task = await getTask(params.username, params.taskId);
+
+  const title = task ? task.title : 'Task not found :(';
+
+  return {
+    title
+  };
+}
+
+export default async function TaskPage({ params }: Props) {
   const session = await getServerSession(authOptions);
 
   if (!session) redirect(PAGES.SIGN_IN);

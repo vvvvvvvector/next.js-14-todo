@@ -1,5 +1,4 @@
 import { cache } from 'react';
-import { type Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';

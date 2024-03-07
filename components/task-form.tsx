@@ -133,7 +133,7 @@ export function CreateTaskForm() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline' size='icon'>
+        <Button className='flex-shrink-0' variant='outline' size='icon'>
           <Icons.plus className='size-4' />
         </Button>
       </DialogTrigger>

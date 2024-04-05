@@ -45,7 +45,7 @@ export const authOptions = {
           }
         }
 
-        return null;
+        throw new Error('Wrong username or password');
       }
     })
   ],

@@ -47,7 +47,9 @@ export function SignInForm() {
       }),
       {
         loading: 'Loading...',
-        success: () => {
+        success: (dt) => {
+          if (dt && dt.error) throw dt;
+
           setLoading(false);
 
           startTransition(() => {
@@ -56,10 +58,10 @@ export function SignInForm() {
 
           return 'Successfully signed in';
         },
-        error: () => {
+        error: (dt) => {
           setLoading(false);
 
-          return 'Wrong username or password!';
+          return dt.error;
         }
       }
     );

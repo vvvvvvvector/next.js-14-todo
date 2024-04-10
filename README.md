@@ -19,7 +19,7 @@ An open source application built using [Next.js 14](https://nextjs.org/).
 
 - Next.js 14 (app router, route handlers, server actions)
 - Prisma
-- Database on PlanetScale
+- Database on ~~PlanetScale~~ **[Neon](https://neon.tech/)**
 - UI lib shadcn-ui
 - Tailwind CSS
 - react-hook-form

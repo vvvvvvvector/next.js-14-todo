@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:gen": "npx prisma generate",
-    "db:push": "dotenvx run --env-file=.env.local -- prisma db push"
+    "db:push": "dotenvx run --env-file=.env.local -- prisma db push",
+    "studio": "dotenvx run --env-file=.env.local -- prisma studio"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^0.29.1",

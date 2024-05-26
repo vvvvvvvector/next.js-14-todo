@@ -148,35 +148,22 @@ export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
     const ownerName = splitted[splitted.length - 2];
     const fullName = `${ownerName}/${repoName}`;
 
-    const linked = await db.repo.count({
+    const repo = await db.repo.upsert({
       where: {
         taskId
+      },
+      update: {
+        repoName,
+        owner: ownerName,
+        fullName
+      },
+      create: {
+        taskId: taskId,
+        repoName,
+        owner: ownerName,
+        fullName
       }
     });
-
-    let repo;
-
-    if (linked) {
-      repo = await db.repo.update({
-        where: {
-          taskId
-        },
-        data: {
-          repoName,
-          owner: ownerName,
-          fullName
-        }
-      });
-    } else {
-      repo = await db.repo.create({
-        data: {
-          taskId: taskId,
-          repoName,
-          owner: ownerName,
-          fullName
-        }
-      });
-    }
 
     revalidatePath('/[username]', 'page');
 

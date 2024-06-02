@@ -1,10 +1,8 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-import { authOptions } from '~/lib/auth';
 import { db } from '~/lib/db';
 import { action } from '~/lib/safe-action';
 
@@ -16,15 +14,12 @@ const doneSchema = z.object({
 const SESSION_EXPIRED_MESSAGE =
   'Your session has expired. To use the app sign in again';
 
-export const toogle = action(doneSchema, async ({ id, done }) => {
+export const toogle = action(doneSchema, async ({ id, done }, { userId }) => {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!userId)
       return {
         failure: SESSION_EXPIRED_MESSAGE
       };
-    }
 
     const task = await db.task.update({
       where: {
@@ -53,36 +48,36 @@ const deleteTaskSchema = z.object({
   id: z.string()
 });
 
-export const deleteTask = action(deleteTaskSchema, async ({ id }) => {
-  try {
-    const session = await getServerSession(authOptions);
+export const deleteTask = action(
+  deleteTaskSchema,
+  async ({ id }, { userId }) => {
+    try {
+      if (!userId)
+        return {
+          failure: SESSION_EXPIRED_MESSAGE
+        };
 
-    if (!session) {
+      const task = await db.task.delete({
+        where: {
+          id
+        },
+        select: {
+          id: true
+        }
+      });
+
+      revalidatePath('/[username]', 'page');
+
+      return task;
+    } catch (e) {
+      console.log(e);
+
       return {
-        failure: SESSION_EXPIRED_MESSAGE
+        failure: 'Error occurred while deleting the task!'
       };
     }
-
-    const task = await db.task.delete({
-      where: {
-        id
-      },
-      select: {
-        id: true
-      }
-    });
-
-    revalidatePath('/[username]', 'page');
-
-    return task;
-  } catch (e) {
-    console.log(e);
-
-    return {
-      failure: 'Error occurred while deleting the task!'
-    };
   }
-});
+);
 
 const createCommentSchema = z.object({
   taskId: z.string(),
@@ -91,20 +86,17 @@ const createCommentSchema = z.object({
 
 export const createComment = action(
   createCommentSchema,
-  async ({ taskId, text }) => {
+  async ({ taskId, text }, { userId }) => {
     try {
-      const session = await getServerSession(authOptions);
-
-      if (!session) {
+      if (!userId)
         return {
           failure: SESSION_EXPIRED_MESSAGE
         };
-      }
 
       const task = await db.comment.create({
         data: {
           taskId,
-          senderId: session.user.id,
+          senderId: userId,
           text
         }
       });
@@ -132,47 +124,47 @@ const linkRepoSchema = z.object({
     })
 });
 
-export const linkRepo = action(linkRepoSchema, async ({ link, taskId }) => {
-  try {
-    const session = await getServerSession(authOptions);
+export const linkRepo = action(
+  linkRepoSchema,
+  async ({ link, taskId }, { userId }) => {
+    try {
+      if (!userId)
+        return {
+          failure: SESSION_EXPIRED_MESSAGE
+        };
 
-    if (!session) {
+      const splitted = link.split('/');
+
+      const repoName = splitted[splitted.length - 1];
+      const ownerName = splitted[splitted.length - 2];
+      const fullName = `${ownerName}/${repoName}`;
+
+      const repo = await db.repo.upsert({
+        where: {
+          taskId
+        },
+        update: {
+          repoName,
+          owner: ownerName,
+          fullName
+        },
+        create: {
+          taskId: taskId,
+          repoName,
+          owner: ownerName,
+          fullName
+        }
+      });
+
+      revalidatePath('/[username]', 'page');
+
+      return repo;
+    } catch (e) {
+      console.log(e);
+
       return {
-        failure: SESSION_EXPIRED_MESSAGE
+        failure: 'Error occurred while linking the repo!'
       };
     }
-
-    const splitted = link.split('/');
-
-    const repoName = splitted[splitted.length - 1];
-    const ownerName = splitted[splitted.length - 2];
-    const fullName = `${ownerName}/${repoName}`;
-
-    const repo = await db.repo.upsert({
-      where: {
-        taskId
-      },
-      update: {
-        repoName,
-        owner: ownerName,
-        fullName
-      },
-      create: {
-        taskId: taskId,
-        repoName,
-        owner: ownerName,
-        fullName
-      }
-    });
-
-    revalidatePath('/[username]', 'page');
-
-    return repo;
-  } catch (e) {
-    console.log(e);
-
-    return {
-      failure: 'Error occurred while linking the repo!'
-    };
   }
-});
+);
